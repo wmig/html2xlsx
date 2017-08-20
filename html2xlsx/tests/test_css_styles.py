@@ -32,4 +32,4 @@ class CssStylingTest(TestCase):
         html = generate_test_html(html)
         parser = InputParser(html)
         table = parser.parse()
-        table.to_workbook('/tmp/proba.xlsx')
+        table.to_workbook('/tmp/style.xlsx')

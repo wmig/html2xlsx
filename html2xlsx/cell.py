@@ -1,6 +1,9 @@
-from webcolors import rgb_to_hex
+import webcolors
 from dateutil.parser import parse
 from xlsxwriter.format import Format
+
+def rgb_to_hex(x):
+    return webcolors.rgb_to_hex(map(int, x))
 
 class Cell(object):
     def __init__(self, content, colspan=0, content_data_type=None, style=None, num_format=None):

@@ -10,12 +10,14 @@ from weasyprint.css import get_all_computed_styles
 
 
 class InputParser(object):
-    def __init__(self, raw):
+    def __init__(self, raw=None, filename=None, url=None, file_obj=None):
         self._input = raw
         if isinstance(raw, six.string_types):
             document = HTML(string=raw)
         elif isinstance(raw, (BytesIO, StringIO)):
             document = HTML(raw)
+        elif filename or url or file_obj:
+            document = HTML(filename=filename, url=url, file_obj=file_obj)
         else:
             raise NotImplementedError
             return
@@ -25,7 +27,7 @@ class InputParser(object):
     def parse(self):
         sheets = []
         i = 1
-        for table in self._root.xpath("//table[@class='sheet']"):
+        for table in self._root.xpath("//table[contains(@class,'sheet')]"):
             name = unicode(table.attrib.get('data-name', 'Sheet%d' % i))
             sheet = Sheet(name)
             head = table.xpath(".//thead/tr/th")
@@ -38,7 +40,8 @@ class InputParser(object):
             for tr in trs:
                 row = sheet.add_row(data=[], style=self._style_for(tr))
                 for td in tr.xpath(".//td"):
-                    c = Cell(content=td.text, content_data_type=td.attrib.get('data-type', None), 
+                    text = ' '.join(map(lambda s:s.strip() ,td.itertext()))
+                    c = Cell(content=text, content_data_type=td.attrib.get('data-type', None),
                              style=self._style_for(td), colspan=td.attrib.get('colspan') or 0, num_format=td.attrib.get('data-num-format', None))
                     row.add_cell(cell=c)
             sheets.append(sheet)
